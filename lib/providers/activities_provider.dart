@@ -12,7 +12,7 @@ class ActivitiesProvider extends ChangeNotifier {
 
   List<ActivityModel> _activities = [];
   List<String> _favorites = [];
-  String _filterType = 'Todos';
+  String _filterType = 'Palestra';
   String? _userName;
   String? _userRole;
 

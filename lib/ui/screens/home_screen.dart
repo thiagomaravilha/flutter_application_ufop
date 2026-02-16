@@ -72,30 +72,78 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildProgramacaoTab() {
     return Consumer<ActivitiesProvider>(
       builder: (context, provider, child) {
-        return Column(
+        return Stack(
           children: [
             Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Wrap(
-                spacing: 8.0,
-                children: AppStrings.activityTypes.map((type) {
-                  return FilterChip(
-                    label: Text(type),
-                    selected: provider.filterType == type,
-                    onSelected: (selected) {
-                      provider.setFilter(type);
-                    },
-                  );
-                }).toList(),
-              ),
-            ),
-            Expanded(
+              padding: const EdgeInsets.only(top: 70), // Espaço para o filtro
               child: ListView.builder(
                 itemCount: provider.activities.length,
                 itemBuilder: (context, index) {
                   final activity = provider.activities[index];
                   return ActivityCard(activity: activity);
                 },
+              ),
+            ),
+            Positioned(
+              top: 16,
+              right: 16,
+              child: GestureDetector(
+                onTap: () {
+                  showMenu<String>(
+                    context: context,
+                    position: const RelativeRect.fromLTRB(1000, 80, 16, 0),
+                    items: [
+                      const PopupMenuItem<String>(
+                        value: 'Palestra',
+                        child: Text('Palestra'),
+                      ),
+                      const PopupMenuItem<String>(
+                        value: 'Workshop',
+                        child: Text('Workshop'),
+                      ),
+                      const PopupMenuItem<String>(
+                        value: 'Todos',
+                        child: Text('Todos'),
+                      ),
+                    ],
+                  ).then((value) {
+                    if (value != null) {
+                      provider.setFilter(value);
+                    }
+                  });
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.1),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.filter_list,
+                        size: 18,
+                        color: provider.filterType != 'Todos' ? Colors.amber : Colors.black87,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        'Filtro: ${provider.filterType}',
+                        style: const TextStyle(
+                          color: Colors.black87,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ],
