@@ -1,6 +1,17 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_ufop/firebase_options.dart';
 
-void main() {
+void main() async { // Adicionado 'async' aqui
+
+  // 2. Garante que o motor do Flutter esteja pronto antes de chamar código nativo
+  WidgetsFlutterBinding.ensureInitialized(); 
+
+  // 3. Inicializa o Firebase usando as configurações geradas
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   runApp(const MyApp());
 }
 

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "868925072147",
+    "project_id": "semanacomputacaoapp",
+    "storage_bucket": "semanacomputacaoapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:868925072147:android:26499bc8539f72c4cb30e6",
+        "android_client_info": {
+          "package_name": "com.example.flutter_application_ufop"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDpiYqf1yryleSyZ41hLFT9DJjANqh9U1Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
