@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/activities_provider.dart';
 import 'activity_form_screen.dart';
+import 'home_screen.dart';
 
 class AdminDashboardScreen extends StatelessWidget {
   const AdminDashboardScreen({super.key});
@@ -12,13 +13,16 @@ class AdminDashboardScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Dashboard Admin'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () {
-              // Logout
-              context.read<ActivitiesProvider>().authService.signOut();
-              Navigator.pop(context);
+          TextButton.icon(
+            onPressed: () async {
+              await context.read<ActivitiesProvider>().authService.signOut();
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (_) => const HomeScreen()),
+                (route) => false,
+              );
             },
+            icon: const Icon(Icons.logout, color: Colors.white),
+            label: const Text('Sair', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),

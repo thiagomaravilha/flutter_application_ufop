@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/activities_provider.dart';
+import '../../core/constants.dart';
 import 'activity_details_screen.dart';
 import 'admin_login_screen.dart';
 
@@ -38,11 +39,12 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.schedule), label: 'Programação'),
-          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: 'Minha Agenda'),
-          BottomNavigationBarItem(icon: Icon(Icons.admin_panel_settings), label: 'Admin'),
+          BottomNavigationBarItem(icon: Icon(AppIcons.event), label: 'Programação'),
+          BottomNavigationBarItem(icon: Icon(AppIcons.favorite), label: 'Minha Agenda'),
+          BottomNavigationBarItem(icon: Icon(AppIcons.admin), label: 'Admin'),
         ],
         currentIndex: _selectedIndex,
+        selectedItemColor: AppColors.secondary,
         onTap: _onItemTapped,
       ),
     );
@@ -74,11 +76,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 itemBuilder: (context, index) {
                   final activity = provider.activities[index];
                   return Card(
-                    margin: const EdgeInsets.all(8.0),
                     child: ListTile(
-                      title: Text(activity.title),
-                      subtitle: Text('${activity.speakerName} - ${activity.location}'),
-                      trailing: Text('${activity.startTime.day}/${activity.startTime.month} ${activity.startTime.hour}:${activity.startTime.minute.toString().padLeft(2, '0')}'),
+                      leading: Icon(AppIcons.event, color: AppColors.primary),
+                      title: Text(activity.title, style: const TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('${activity.speakerName} - ${activity.location}'),
+                          Text('${activity.startTime.day}/${activity.startTime.month} ${activity.startTime.hour}:${activity.startTime.minute.toString().padLeft(2, '0')} - ${activity.endTime.hour}:${activity.endTime.minute.toString().padLeft(2, '0')}', style: const TextStyle(fontSize: 12)),
+                        ],
+                      ),
+                      trailing: Chip(label: Text(activity.type, style: const TextStyle(fontSize: 10))),
                       onTap: () {
                         Navigator.push(
                           context,
@@ -102,16 +110,34 @@ class _HomeScreenState extends State<HomeScreen> {
     return Consumer<ActivitiesProvider>(
       builder: (context, provider, child) {
         final favorites = provider.favoriteActivities;
+        if (favorites.isEmpty) {
+          return const Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.star_border, size: 64, color: Colors.grey),
+                SizedBox(height: 16),
+                Text('Nenhuma atividade favorita ainda.', style: TextStyle(color: Colors.grey)),
+              ],
+            ),
+          );
+        }
         return ListView.builder(
           itemCount: favorites.length,
           itemBuilder: (context, index) {
             final activity = favorites[index];
             return Card(
-              margin: const EdgeInsets.all(8.0),
               child: ListTile(
-                title: Text(activity.title),
-                subtitle: Text('${activity.speakerName} - ${activity.location}'),
-                trailing: Text('${activity.startTime.day}/${activity.startTime.month} ${activity.startTime.hour}:${activity.startTime.minute.toString().padLeft(2, '0')}'),
+                leading: Icon(AppIcons.favorite, color: AppColors.secondary),
+                title: Text(activity.title, style: const TextStyle(fontWeight: FontWeight.bold)),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('${activity.speakerName} - ${activity.location}'),
+                    Text('${activity.startTime.day}/${activity.startTime.month} ${activity.startTime.hour}:${activity.startTime.minute.toString().padLeft(2, '0')} - ${activity.endTime.hour}:${activity.endTime.minute.toString().padLeft(2, '0')}', style: const TextStyle(fontSize: 12)),
+                  ],
+                ),
+                trailing: Chip(label: Text(activity.type, style: const TextStyle(fontSize: 10))),
                 onTap: () {
                   Navigator.push(
                     context,

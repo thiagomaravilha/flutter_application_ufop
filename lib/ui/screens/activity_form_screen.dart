@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/activities_provider.dart';
 import '../../models/activity_model.dart';
+import '../../core/constants.dart';
 
 class ActivityFormScreen extends StatefulWidget {
   final ActivityModel? activity;
@@ -99,27 +100,53 @@ class _ActivityFormScreenState extends State<ActivityFormScreen> {
           children: [
             TextFormField(
               controller: _titleController,
-              decoration: const InputDecoration(labelText: 'Título'),
+              decoration: const InputDecoration(
+                labelText: 'Título',
+                prefixIcon: Icon(AppIcons.title),
+                border: OutlineInputBorder(),
+              ),
               validator: (value) => value!.isEmpty ? 'Campo obrigatório' : null,
             ),
+            const SizedBox(height: 16),
             TextFormField(
               controller: _descriptionController,
-              decoration: const InputDecoration(labelText: 'Descrição'),
+              decoration: const InputDecoration(
+                labelText: 'Descrição',
+                prefixIcon: Icon(AppIcons.description),
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 3,
               validator: (value) => value!.isEmpty ? 'Campo obrigatório' : null,
             ),
+            const SizedBox(height: 16),
             TextFormField(
               controller: _speakerNameController,
-              decoration: const InputDecoration(labelText: 'Nome do Palestrante'),
+              decoration: const InputDecoration(
+                labelText: 'Nome do Palestrante',
+                prefixIcon: Icon(AppIcons.person),
+                border: OutlineInputBorder(),
+              ),
               validator: (value) => value!.isEmpty ? 'Campo obrigatório' : null,
             ),
+            const SizedBox(height: 16),
             TextFormField(
               controller: _speakerBioController,
-              decoration: const InputDecoration(labelText: 'Biografia do Palestrante'),
+              decoration: const InputDecoration(
+                labelText: 'Biografia do Palestrante',
+                prefixIcon: Icon(AppIcons.info),
+                border: OutlineInputBorder(),
+              ),
+              maxLines: 2,
               validator: (value) => value!.isEmpty ? 'Campo obrigatório' : null,
             ),
+            const SizedBox(height: 16),
             TextFormField(
               controller: _locationController,
-              decoration: const InputDecoration(labelText: 'Local'),
+              decoration: const InputDecoration(
+                labelText: 'Local',
+                prefixIcon: Icon(AppIcons.location),
+                border: OutlineInputBorder(),
+              ),
               validator: (value) => value!.isEmpty ? 'Campo obrigatório' : null,
             ),
             DropdownButtonFormField<String>(
