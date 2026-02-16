@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
 import '../../providers/activities_provider.dart';
 import '../../models/activity_model.dart';
 import '../../core/constants.dart';
+import '../../core/utils.dart';
 
 class ActivityDetailsScreen extends StatelessWidget {
   final ActivityModel activity;
@@ -49,7 +49,12 @@ class ActivityDetailsScreen extends StatelessWidget {
               children: [
                 Icon(AppIcons.time, color: AppColors.primary),
                 const SizedBox(width: 8),
-                Text('Horário: ${DateFormat('dd/MM - HH:mm').format(activity.startTime)} - ${DateFormat('HH:mm').format(activity.endTime)}'),
+                Expanded(
+                  child: Text(
+                    'Horário:\n${DateTimeUtils.formatDateTimeRange(activity.startTime, activity.endTime)}',
+                    style: const TextStyle(height: 1.5),
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 16),

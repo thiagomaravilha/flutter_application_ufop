@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/activities_provider.dart';
 import '../../core/constants.dart';
-import 'activity_details_screen.dart';
-import 'admin_login_screen.dart';
+import '../widgets/activity_card.dart';
+import 'welcome_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,7 +15,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 0;
 
-  static const List<String> _tabs = ['Programação', 'Minha Agenda', 'Admin'];
+  static const List<String> _tabs = AppStrings.tabs;
 
   void _onItemTapped(int index) {
     setState(() {
@@ -25,28 +25,47 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_tabs[_selectedIndex]),
-      ),
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: [
-          _buildProgramacaoTab(),
-          _buildAgendaTab(),
-          const AdminLoginScreen(),
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(icon: Icon(AppIcons.event), label: 'Programação'),
-          BottomNavigationBarItem(icon: Icon(AppIcons.favorite), label: 'Minha Agenda'),
-          BottomNavigationBarItem(icon: Icon(AppIcons.admin), label: 'Admin'),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: AppColors.secondary,
-        onTap: _onItemTapped,
-      ),
+    return Consumer<ActivitiesProvider>(
+      builder: (context, provider, child) {
+        String title = _tabs[_selectedIndex];
+        if (provider.isLoggedIn && provider.userName != null) {
+          title = 'Olá, ${provider.userName}';
+        }
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(title),
+            automaticallyImplyLeading: false,
+            actions: [
+              TextButton.icon(
+                onPressed: () {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (_) => const WelcomeScreen()),
+                    (route) => false,
+                  );
+                },
+                icon: const Icon(Icons.logout, color: Colors.white),
+                label: const Text('Sair', style: TextStyle(color: Colors.white)),
+              ),
+            ],
+          ),
+          body: IndexedStack(
+            index: _selectedIndex,
+            children: [
+              _buildProgramacaoTab(),
+              _buildAgendaTab(),
+            ],
+          ),
+          bottomNavigationBar: BottomNavigationBar(
+            items: const [
+              BottomNavigationBarItem(icon: Icon(AppIcons.event), label: 'Programação'),
+              BottomNavigationBarItem(icon: Icon(AppIcons.favorite), label: 'Minha Agenda'),
+            ],
+            currentIndex: _selectedIndex,
+            selectedItemColor: AppColors.secondary,
+            onTap: _onItemTapped,
+          ),
+        );
+      },
     );
   }
 
@@ -59,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.all(8.0),
               child: Wrap(
                 spacing: 8.0,
-                children: ['Todos', 'Palestra', 'Workshop'].map((type) {
+                children: AppStrings.activityTypes.map((type) {
                   return FilterChip(
                     label: Text(type),
                     selected: provider.filterType == type,
@@ -75,28 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 itemCount: provider.activities.length,
                 itemBuilder: (context, index) {
                   final activity = provider.activities[index];
-                  return Card(
-                    child: ListTile(
-                      leading: Icon(AppIcons.event, color: AppColors.primary),
-                      title: Text(activity.title, style: const TextStyle(fontWeight: FontWeight.bold)),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text('${activity.speakerName} - ${activity.location}'),
-                          Text('${activity.startTime.day}/${activity.startTime.month} ${activity.startTime.hour}:${activity.startTime.minute.toString().padLeft(2, '0')} - ${activity.endTime.hour}:${activity.endTime.minute.toString().padLeft(2, '0')}', style: const TextStyle(fontSize: 12)),
-                        ],
-                      ),
-                      trailing: Chip(label: Text(activity.type, style: const TextStyle(fontSize: 10))),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ActivityDetailsScreen(activity: activity),
-                          ),
-                        );
-                      },
-                    ),
-                  );
+                  return ActivityCard(activity: activity);
                 },
               ),
             ),
@@ -126,27 +124,9 @@ class _HomeScreenState extends State<HomeScreen> {
           itemCount: favorites.length,
           itemBuilder: (context, index) {
             final activity = favorites[index];
-            return Card(
-              child: ListTile(
-                leading: Icon(AppIcons.favorite, color: AppColors.secondary),
-                title: Text(activity.title, style: const TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('${activity.speakerName} - ${activity.location}'),
-                    Text('${activity.startTime.day}/${activity.startTime.month} ${activity.startTime.hour}:${activity.startTime.minute.toString().padLeft(2, '0')} - ${activity.endTime.hour}:${activity.endTime.minute.toString().padLeft(2, '0')}', style: const TextStyle(fontSize: 12)),
-                  ],
-                ),
-                trailing: Chip(label: Text(activity.type, style: const TextStyle(fontSize: 10))),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ActivityDetailsScreen(activity: activity),
-                    ),
-                  );
-                },
-              ),
+            return ActivityCard(
+              activity: activity,
+              leadingIcon: AppIcons.favorite,
             );
           },
         );

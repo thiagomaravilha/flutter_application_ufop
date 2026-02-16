@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../providers/activities_provider.dart';
 import '../../models/activity_model.dart';
@@ -56,6 +57,10 @@ class _ActivityFormScreenState extends State<ActivityFormScreen> {
           final newDateTime = DateTime(date.year, date.month, date.day, time.hour, time.minute);
           if (isStart) {
             _startTime = newDateTime;
+            // Se após alterar o início, o fim ficar anterior ou igual, ajustar automaticamente
+            if (_endTime.isBefore(_startTime) || _endTime.isAtSameMomentAs(_startTime)) {
+              _endTime = _startTime.add(const Duration(hours: 1));
+            }
           } else {
             _endTime = newDateTime;
           }
@@ -66,6 +71,17 @@ class _ActivityFormScreenState extends State<ActivityFormScreen> {
 
   void _save() {
     if (_formKey.currentState!.validate()) {
+      // Validação: data/hora de fim deve ser posterior à data/hora de início
+      if (_endTime.isBefore(_startTime) || _endTime.isAtSameMomentAs(_startTime)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('A data e hora de fim deve ser posterior à data e hora de início'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
       final activity = ActivityModel(
         id: widget.activity?.id ?? '',
         title: _titleController.text,
@@ -149,6 +165,7 @@ class _ActivityFormScreenState extends State<ActivityFormScreen> {
               ),
               validator: (value) => value!.isEmpty ? 'Campo obrigatório' : null,
             ),
+            const SizedBox(height: 16),
             DropdownButtonFormField<String>(
               initialValue: _type,
               items: ['Palestra', 'Workshop'].map((type) {
@@ -158,12 +175,12 @@ class _ActivityFormScreenState extends State<ActivityFormScreen> {
               decoration: const InputDecoration(labelText: 'Tipo'),
             ),
             ListTile(
-              title: Text('Início: ${_startTime.toString()}'),
+              title: Text('Início: ${DateFormat('dd/MM/yyyy').format(_startTime)} às ${DateFormat('HH:mm').format(_startTime)}'),
               trailing: const Icon(Icons.calendar_today),
               onTap: () => _selectDateTime(true),
             ),
             ListTile(
-              title: Text('Fim: ${_endTime.toString()}'),
+              title: Text('Fim: ${DateFormat('dd/MM/yyyy').format(_endTime)} às ${DateFormat('HH:mm').format(_endTime)}'),
               trailing: const Icon(Icons.calendar_today),
               onTap: () => _selectDateTime(false),
             ),

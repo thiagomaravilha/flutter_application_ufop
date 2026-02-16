@@ -1,36 +1,49 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../providers/activities_provider.dart';
 import '../../services/auth_service.dart';
 import '../../core/constants.dart';
 import 'admin_dashboard_screen.dart';
+import 'home_screen.dart';
+import 'signup_screen.dart';
 
-class AdminLoginScreen extends StatefulWidget {
-  const AdminLoginScreen({super.key});
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
 
   @override
-  State<AdminLoginScreen> createState() => _AdminLoginScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _AdminLoginScreenState extends State<AdminLoginScreen> {
+class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final AuthService _authService = AuthService();
+  bool _isLoading = false;
 
   Future<void> _login() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
     try {
-      await _authService.signIn(_emailController.text, _passwordController.text);
-      if (mounted && context.read<ActivitiesProvider>().isAdmin) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const AdminDashboardScreen()),
-        );
-      } else {
+      await _authService.signIn(_emailController.text.trim(), _passwordController.text);
+
+      if (_authService.currentUser != null) {
+        String role = await _authService.getUserRole(_authService.currentUser!.uid);
+
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Acesso negado. Usuário não é admin.')),
-          );
+          if (role == 'admin') {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const AdminDashboardScreen()),
+            );
+          } else {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const HomeScreen()),
+            );
+          }
         }
       }
     } catch (e) {
@@ -39,13 +52,19 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
           SnackBar(content: Text('Erro no login: $e')),
         );
       }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Login Admin')),
+      appBar: AppBar(title: const Text('Entrar')),
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -59,17 +78,18 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(AppIcons.admin, size: 64, color: AppColors.primary),
+                    const Icon(AppIcons.person, size: 64, color: AppColors.primary),
                     const SizedBox(height: 16),
-                    const Text('Login Admin', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                    const Text('Entrar na Conta', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 24),
                     TextFormField(
                       controller: _emailController,
                       decoration: const InputDecoration(
-                        labelText: 'Email',
+                        labelText: 'E-mail',
                         prefixIcon: Icon(AppIcons.email),
                         border: OutlineInputBorder(),
                       ),
+                      keyboardType: TextInputType.emailAddress,
                       validator: (value) => value!.isEmpty ? 'Campo obrigatório' : null,
                     ),
                     const SizedBox(height: 16),
@@ -87,9 +107,21 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: _login,
-                        child: const Text('Entrar'),
+                        onPressed: _isLoading ? null : _login,
+                        child: _isLoading
+                            ? const CircularProgressIndicator()
+                            : const Text('Entrar'),
                       ),
+                    ),
+                    const SizedBox(height: 16),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const SignUpScreen()),
+                        );
+                      },
+                      child: const Text('Criar nova conta'),
                     ),
                   ],
                 ),

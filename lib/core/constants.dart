@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static const Color primary = Color(0xFF1976D2); // Azul
-  static const Color secondary = Color(0xFFFF9800); // Laranja
+  static const Color primary = Color(0xFF962038); // Vermelho Bordô UFOP
+  static const Color secondary = Color(0xFF53565A); // Cinza Chumbo UFOP
+  static const Color background = Color(0xFFF5F5F5); // Cinza claro
   static const Color surface = Colors.white;
   static const Color onSurface = Colors.black;
   static const Color chipBackground = Color(0xFFE3F2FD);
@@ -22,4 +23,9 @@ class AppIcons {
   static const IconData lock = Icons.lock;
   static const IconData title = Icons.title;
   static const IconData info = Icons.info;
+}
+
+class AppStrings {
+  static const List<String> activityTypes = ['Todos', 'Palestra', 'Workshop'];
+  static const List<String> tabs = ['Programação', 'Minha Agenda'];
 }
